@@ -17,7 +17,10 @@ export default defineConfig({
     },
     plugins: [react()],
     define: {
-        'process.env': {}
+      'process.env': {}
+    },
+    build: {
+      target: 'esnext' // Critical for PDF.js
     }
   }
 })

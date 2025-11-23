@@ -1,27 +1,36 @@
-import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+// Import worker as a URL so Vite bundles it for offline use
+import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// Configure the worker (required for Vite)
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+GlobalWorkerOptions.workerSrc = workerUrl;
 
 export async function convertPdfToImages(file: File): Promise<string[]> {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-  const images: string[] = [];
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    
+    const images: string[] = [];
 
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 1.5 }); // 1.5x scale for better quality
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.5 });
+      
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
 
-    if (!context) continue;
+      if (!context) continue;
 
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    images.push(canvas.toDataURL('image/png'));
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      images.push(canvas.toDataURL('image/png'));
+    }
+
+    return images;
+  } catch (error) {
+    console.error("PDF Import Failed:", error);
+    throw error;
   }
-
-  return images;
 }
