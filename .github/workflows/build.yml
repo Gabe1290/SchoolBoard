@@ -1,34 +1,58 @@
 name: Build Desktop Apps
 
-on:
-  push:
-    branches: [ main ]
+on: push
 
 jobs:
-  build:
+  # JOB 1: Build the Linux App on a Linux Server
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Check out code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Build React Code
+        run: npm run build
+        
+      - name: Package Linux App
+        # We run electron-builder directly to avoid script confusion
+        run: npx electron-builder --linux
+        
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Linux-App
+          path: dist/*.AppImage
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
-
-    - name: Install Dependencies
-      run: npm install
-
-    - name: Build and Package (Linux & Windows)
-      # We build Linux and Windows on a Linux server because it's cheaper/faster
-      # and electron-builder supports it.
-      run: npm run dist -- --linux --win
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: SchoolBoard-Installers
-        path: |
-          dist/*.AppImage
-          dist/*.exe
+  # JOB 2: Build the Windows App on a Windows Server
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Build React Code
+        run: npm run build
+        
+      - name: Package Windows App
+        # This works natively because we are on 'windows-latest'
+        run: npx electron-builder --win
+        
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-App
+          path: dist/*.exe
