@@ -1,12 +1,15 @@
-import { Tldraw } from 'tldraw'
-import 'tldraw/tldraw.css'
+import { Excalidraw } from "@excalidraw/excalidraw";
 
 function App() {
   return (
-    <div style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh' }}>
-      <Tldraw persistenceKey="school-whiteboard-local" />
+    <div style={{ height: "100vh", width: "100vw" }}>
+      <Excalidraw 
+        initialData={{
+          appState: { viewBackgroundColor: "#ffffff" }
+        }}
+      />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
