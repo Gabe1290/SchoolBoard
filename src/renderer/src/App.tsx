@@ -110,27 +110,45 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
+    // MAIN CONTAINER: Flex row, full viewport height
+    <div style={{ display: "flex", height: "100vh", width: "100vw", overflow: "hidden" }}>
       
       {/* --- SIDEBAR --- */}
-      <div className="w-48 bg-gray-100 border-r border-gray-300 flex flex-col overflow-y-auto">
-        <div className="p-4 border-b border-gray-300 font-bold">Pages</div>
+      <div style={{ 
+          width: "200px", 
+          backgroundColor: "#f3f4f6", 
+          borderRight: "1px solid #d1d5db", 
+          display: "flex", 
+          flexDirection: "column",
+          overflowY: "auto"
+      }}>
+        <div style={{ padding: "1rem", borderBottom: "1px solid #d1d5db", fontWeight: "bold" }}>
+            Pages
+        </div>
         
         {/* Page List */}
-        <div className="flex-1 p-2 space-y-2">
+        <div style={{ flex: 1, padding: "0.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {pages.map((page, index) => (
                 <div 
                     key={page.id}
                     onClick={() => switchToPage(page.id)}
-                    className={`cursor-pointer border-2 rounded p-2 ${activePageId === page.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'}`}
+                    style={{
+                        cursor: "pointer",
+                        border: activePageId === page.id ? "2px solid #3b82f6" : "1px solid #d1d5db",
+                        backgroundColor: activePageId === page.id ? "#eff6ff" : "white",
+                        padding: "0.5rem",
+                        borderRadius: "4px"
+                    }}
                 >
-                    <div className="text-xs font-bold mb-1">Page {index + 1}</div>
-                    {/* Thumbnail */}
-                    <div className="h-24 w-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                    <div style={{ fontSize: "0.75rem", fontWeight: "bold", marginBottom: "4px" }}>
+                        Page {index + 1}
+                    </div>
+                    {/* Thumbnail placeholder */}
+                    <div style={{ height: "60px", backgroundColor: "#e5e7eb", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                         {page.thumbnail ? (
-                            <img src={page.thumbnail} className="object-contain h-full w-full" />
+                            <img src={page.thumbnail} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                         ) : (
-                            <span className="text-gray-400 text-xs">Blank</span>
+                            <span style={{ fontSize: "10px", color: "#9ca3af" }}>Blank</span>
                         )}
                     </div>
                 </div>
@@ -138,22 +156,23 @@ function App() {
         </div>
 
         {/* Controls */}
-        <div className="p-2 border-t border-gray-300 space-y-2">
+        <div style={{ padding: "0.5rem", borderTop: "1px solid #d1d5db", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <button 
                 onClick={addNewPage}
-                className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
+                style={{ width: "100%", backgroundColor: "#2563eb", color: "white", padding: "8px", borderRadius: "4px", border: "none", cursor: "pointer" }}
             >
                 + New Page
             </button>
-            <label className="block w-full text-center bg-green-600 text-white p-2 rounded cursor-pointer hover:bg-green-700 transition">
+            <label style={{ display: "block", width: "100%", textAlign: "center", backgroundColor: "#16a34a", color: "white", padding: "8px", borderRadius: "4px", cursor: "pointer" }}>
                 Import PDF
-                <input type="file" accept=".pdf" className="hidden" onChange={handlePdfUpload}/>
+                <input type="file" accept=".pdf" style={{ display: "none" }} onChange={handlePdfUpload}/>
             </label>
         </div>
       </div>
 
-      {/* --- MAIN CANVAS --- */}
-      <div className="flex-1 h-full relative">
+      {/* --- MAIN CANVAS WRAPPER --- */}
+      {/* This was the broken part. We force it to take all remaining width/height */}
+      <div style={{ flex: 1, position: "relative", height: "100%" }}>
         <Excalidraw 
             excalidrawAPI={(api) => excalidrawRef.current = api}
             initialData={{ appState: { viewBackgroundColor: "#ffffff" } }}
