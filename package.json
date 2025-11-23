@@ -7,11 +7,9 @@
   "homepage": "https://electron-vite.org",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "electron-vite build --ignore-ts-errors",
+    "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "build:win": "npm run build && electron-builder --win --config",
-    "build:linux": "npm run build && electron-builder --linux --config",
-    "build:mac": "npm run build && electron-builder --mac --config"
+    "dist": "npm run build && electron-builder"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
